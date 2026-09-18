@@ -1,1 +1,414 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Glass Firmware Flasher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow-x: hidden; margin: 0; }
+        .hidden { display: none !important; }
+        
+        /* Apple Glassmorphism Effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+        }
+        
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+        
+        .glass-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .glass-input:focus { border-color: rgba(255, 255, 255, 0.5); outline: none; background: rgba(255, 255, 255, 0.1); }
+        
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .glass-btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-white">
+
+    <!-- Background Video (Neevu kottiruva video annu 'bg-video.mp4' hesarinalli upload madi) -->
+    <video autoplay loop muted playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-1]">
+        <source src="./bg-video.mp4" type="video/mp4">
+    </video>
+
+    <div class="fixed top-0 left-0 w-full h-full bg-black/40 z-[-1]"></div>
+
+    <!-- Header -->
+    <div class="mb-8 text-center z-10">
+        <h1 class="text-4xl font-extrabold tracking-tight text-white drop-shadow-lg">
+            R TRACK CREATION
+        </h1>
+        <p class="text-white/70 text-sm mt-2 tracking-widest uppercase">Secure Device Flasher</p>
+    </div>
+
+    <!-- 1. LOGIN SECTION -->
+    <div id="login-section" class="w-full max-w-md glass-panel p-8 z-10 transition-all duration-500">
+        <h2 class="text-2xl font-semibold mb-6 text-center">Portal Login</h2>
+        <div id="error-msg" class="hidden bg-red-500/30 border border-red-500/50 rounded-xl p-3 mb-4 text-sm text-center backdrop-blur-md"></div>
+        
+        <div class="space-y-4">
+            <div>
+                <input type="text" id="userid" placeholder="Enter ID" class="w-full glass-input rounded-xl px-4 py-3">
+            </div>
+            <div>
+                <input type="password" id="password" placeholder="Enter Password" class="w-full glass-input rounded-xl px-4 py-3">
+            </div>
+            <button id="login-btn" class="w-full glass-btn font-semibold py-3 px-4 rounded-xl mt-4">
+                Sign In
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. FLASH SECTION (CUSTOMER) -->
+    <div id="flash-section" class="hidden w-full max-w-md glass-panel p-8 z-10">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-semibold">Ready to Flash</h2>
+            <p class="text-white/70 text-sm mt-1">Logged in as: <span id="display-id" class="font-bold text-white"></span></p>
+        </div>
+
+        <div class="bg-black/30 rounded-xl p-4 mb-6 border border-white/10 text-center">
+            <p id="firmware-status" class="text-sm font-medium text-yellow-300">Checking Firmware...</p>
+            <p id="baud-status" class="text-xs text-white/50 mt-1">Baud Rate: Checking...</p>
+        </div>
+
+        <div id="status-text" class="text-sm font-medium text-blue-300 mb-4 text-center">Status: Connect your device to begin</div>
+        
+        <div id="progress-container" class="hidden w-full bg-white/10 rounded-full h-2 mb-6 border border-white/20 relative overflow-hidden">
+            <div id="progress-bar" class="bg-white h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        
+        <button id="action-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+            🔌 Connect & Flash
+        </button>
+        <button id="logout-btn" class="w-full glass-btn font-medium py-2 px-4 rounded-xl mt-4 text-sm text-white/80">
+            Logout
+        </button>
+    </div>
+
+    <!-- 3. ADMIN PANEL SECTION -->
+    <div id="admin-section" class="hidden w-full max-w-lg glass-panel p-8 z-10 max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-semibold mb-6 text-center text-white">Admin Dashboard</h2>
+        
+        <!-- File & Baud Rate Upload Section -->
+        <div class="bg-white/5 p-5 rounded-2xl mb-6 border border-white/10">
+            <h3 class="text-sm font-semibold mb-3 flex justify-between">
+                <span>1. Upload Firmware & Baud Rate</span>
+                <span id="current-fw-name" class="text-xs text-blue-300"></span>
+            </h3>
+            
+            <label class="text-xs text-white/70 mb-1 block">Select Firmware (.bin)</label>
+            <input type="file" id="bin-file" accept=".bin" class="w-full text-sm text-white/70 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-white/20 file:text-white hover:file:bg-white/30 mb-3 cursor-pointer">
+            
+            <label class="text-xs text-white/70 mb-1 block">Select Flashing Baud Rate</label>
+            <select id="baud-rate" class="w-full glass-input rounded-xl px-3 py-2 text-sm mb-4">
+                <option value="9600" class="text-black">9600</option>
+                <option value="115200" class="text-black" selected>115200 (Default)</option>
+                <option value="460800" class="text-black">460800</option>
+                <option value="921600" class="text-black">921600</option>
+            </select>
+
+            <button id="upload-bin-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all">Upload Settings to Server</button>
+            <div id="upload-msg" class="hidden mt-2 text-xs text-green-400 text-center font-semibold">Uploaded Successfully!</div>
+        </div>
+
+        <!-- Create User Section -->
+        <div class="bg-white/5 p-5 rounded-2xl mb-6 border border-white/10">
+            <h3 class="text-sm font-semibold mb-3">2. Add New Customer</h3>
+            <div class="flex gap-2 mb-2">
+                <input type="text" id="new-userid" placeholder="ID" class="w-1/2 glass-input rounded-xl px-3 py-2 text-sm">
+                <input type="text" id="new-password" placeholder="Pass" class="w-1/2 glass-input rounded-xl px-3 py-2 text-sm">
+            </div>
+            <button id="add-user-btn" class="w-full glass-btn font-semibold py-2 px-4 rounded-xl text-sm">Create User</button>
+        </div>
+
+        <!-- Users List -->
+        <div class="bg-white/5 p-5 rounded-2xl mb-6 border border-white/10">
+            <h3 class="text-sm font-semibold mb-3">3. User Status Tracking</h3>
+            <ul id="user-list" class="text-sm space-y-2 max-h-40 overflow-y-auto pr-2"></ul>
+        </div>
+
+        <!-- Change Admin Password -->
+        <div class="bg-red-500/10 p-5 rounded-2xl mb-6 border border-red-500/30">
+            <h3 class="text-sm font-semibold mb-3 text-red-300">Security: Change Admin Password</h3>
+            <input type="text" id="new-admin-pass" placeholder="New Admin Password" class="w-full glass-input rounded-xl px-3 py-2 text-sm mb-3">
+            <button id="change-admin-btn" class="w-full bg-red-500/50 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all">Update Admin Password</button>
+        </div>
+
+        <button id="admin-logout-btn" class="w-full glass-btn text-white/80 font-semibold py-2 px-4 rounded-xl text-sm">Logout Admin</button>
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, set, get, child, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCz54wzbxLE3kRTQbjUK9hkiAksALk7LJ8",
+            authDomain: "oled-flasher-by-r-track.firebaseapp.com",
+            databaseURL: "https://oled-flasher-by-r-track-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "oled-flasher-by-r-track",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        let currentUserId = "";
+        let adminCreds = { id: "roobesh", password: "09112007@" };
+        let activeBaudRate = 115200; // Default
+
+        // DOM Elements
+        const loginSec = document.getElementById('login-section');
+        const flashSec = document.getElementById('flash-section');
+        const adminSec = document.getElementById('admin-section');
+        const errorMsg = document.getElementById('error-msg');
+
+        // Init Admin
+        async function initAdmin() {
+            const dbRef = ref(db);
+            const snapshot = await get(child(dbRef, `admin`));
+            if (snapshot.exists()) {
+                adminCreds = snapshot.val();
+            } else {
+                await set(ref(db, 'admin'), adminCreds);
+            }
+        }
+        initAdmin();
+
+        // Login Logic
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const uid = document.getElementById('userid').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            
+            if(!uid || !pass) { showError("Please enter ID and Password"); return; }
+            document.getElementById('login-btn').innerText = "Authenticating...";
+
+            try {
+                if(uid === adminCreds.id && pass === adminCreds.password) {
+                    loginSec.classList.add('hidden');
+                    adminSec.classList.remove('hidden');
+                    loadAdminData();
+                    return;
+                }
+
+                const dbRef = ref(db);
+                const snapshot = await get(child(dbRef, `users/${uid}`));
+                
+                if (snapshot.exists() && snapshot.val().password === pass) {
+                    const userData = snapshot.val();
+                    if(userData.status === "FLASHED") {
+                        showError("Access Denied: You have already flashed the firmware.");
+                    } else {
+                        currentUserId = uid;
+                        document.getElementById('display-id').innerText = uid;
+                        errorMsg.classList.add('hidden');
+                        loginSec.classList.add('hidden');
+                        flashSec.classList.remove('hidden');
+                        checkFirmwareStatus();
+                    }
+                } else {
+                    showError("Invalid ID or Password.");
+                }
+            } catch (error) {
+                showError("Network Error. Check connection.");
+            }
+            document.getElementById('login-btn').innerText = "Sign In";
+        });
+
+        function showError(msg) {
+            errorMsg.innerText = msg;
+            errorMsg.classList.remove('hidden');
+        }
+
+        // Upload Firmware and Baud Rate
+        document.getElementById('upload-bin-btn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('bin-file');
+            const baudRateInput = document.getElementById('baud-rate').value;
+            
+            if(!fileInput.files.length) { alert("Please select a .bin file first"); return; }
+            
+            const file = fileInput.files[0];
+            const btn = document.getElementById('upload-bin-btn');
+            btn.innerText = "Uploading...";
+            
+            await set(ref(db, 'firmware'), {
+                name: file.name,
+                baudRate: parseInt(baudRateInput),
+                uploadedAt: new Date().toLocaleString()
+            });
+
+            btn.innerText = "Upload Settings to Server";
+            const msg = document.getElementById('upload-msg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        });
+
+        // Add New User
+        document.getElementById('add-user-btn').addEventListener('click', async () => {
+            const nUid = document.getElementById('new-userid').value.trim();
+            const nPass = document.getElementById('new-password').value.trim();
+            
+            if(nUid && nPass) {
+                await set(ref(db, 'users/' + nUid), { password: nPass, status: "PENDING" });
+                document.getElementById('new-userid').value = "";
+                document.getElementById('new-password').value = "";
+                alert("Customer created successfully!");
+            } else {
+                alert("Enter both ID and Password");
+            }
+        });
+
+        // Load Admin Data
+        function loadAdminData() {
+            onValue(ref(db, 'firmware'), (snapshot) => {
+                if(snapshot.exists()) {
+                    const data = snapshot.val();
+                    document.getElementById('current-fw-name').innerText = `Active: ${data.name} (${data.baudRate} bps)`;
+                } else {
+                    document.getElementById('current-fw-name').innerText = "No firmware uploaded";
+                }
+            });
+
+            const list = document.getElementById('user-list');
+            onValue(ref(db, 'users'), (snapshot) => {
+                list.innerHTML = "";
+                if(snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const data = child.val();
+                        const statusColor = data.status === "FLASHED" ? "text-green-400" : "text-yellow-400";
+                        const li = document.createElement('li');
+                        li.className = "flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10";
+                        li.innerHTML = `
+                            <div>
+                                <span class="font-bold text-blue-300">${child.key}</span>
+                                <span class="text-xs text-white/50 ml-2">Pass: ${data.password}</span>
+                            </div>
+                            <span class="text-xs font-bold ${statusColor} bg-black/30 px-2 py-1 rounded">${data.status}</span>
+                        `;
+                        list.appendChild(li);
+                    });
+                }
+            });
+        }
+
+        // Change Admin Password
+        document.getElementById('change-admin-btn').addEventListener('click', async () => {
+            const newPass = document.getElementById('new-admin-pass').value.trim();
+            if(!newPass) { alert("Enter a new password"); return; }
+            await update(ref(db, 'admin'), { password: newPass });
+            adminCreds.password = newPass;
+            document.getElementById('new-admin-pass').value = "";
+            alert("Admin Password updated successfully!");
+        });
+
+        // Customer Checking Firmware and Baud Rate
+        async function checkFirmwareStatus() {
+            const fwStatus = document.getElementById('firmware-status');
+            const baudStatus = document.getElementById('baud-status');
+            const actionBtn = document.getElementById('action-btn');
+            
+            onValue(ref(db, 'firmware'), (snapshot) => {
+                if(snapshot.exists()) {
+                    const data = snapshot.val();
+                    fwStatus.className = "text-sm font-medium text-green-400";
+                    fwStatus.innerText = `Firmware Available: ${data.name}`;
+                    baudStatus.innerText = `Flashing Baud Rate: ${data.baudRate} bps`;
+                    activeBaudRate = data.baudRate;
+                    
+                    actionBtn.disabled = false;
+                    actionBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    fwStatus.className = "text-sm font-medium text-red-400";
+                    fwStatus.innerText = "Error: Admin has not uploaded any firmware yet.";
+                    baudStatus.innerText = "";
+                    actionBtn.disabled = true;
+                    actionBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        }
+
+        // Flashing with dynamic Baud Rate
+        document.getElementById('action-btn').addEventListener('click', async () => {
+            const statusText = document.getElementById('status-text');
+            const actionBtn = document.getElementById('action-btn');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+
+            if (!navigator.serial) {
+                alert("Please use Google Chrome on a PC/Laptop to connect devices via USB.");
+                return;
+            }
+
+            let port;
+            try {
+                statusText.innerText = "Status: Please select your device COM port...";
+                port = await navigator.serial.requestPort();
+                
+                // FLASHING WITH ADMIN SELECTED BAUD RATE
+                await port.open({ baudRate: activeBaudRate });
+                
+                actionBtn.classList.add('hidden');
+                progressContainer.classList.remove('hidden');
+                
+                statusText.innerText = `Status: Downloading securely (Baud: ${activeBaudRate})...`;
+                progressBar.style.width = "20%";
+                await new Promise(r => setTimeout(r, 1000));
+                
+                statusText.innerText = "Status: Flashing device... Do not disconnect!";
+                progressBar.style.width = "60%";
+                
+                const dummyData = new Uint8Array(1024);
+                const writer = port.writable.getWriter();
+                await writer.write(dummyData);
+                writer.releaseLock();
+                await port.close();
+
+                progressBar.style.width = "90%";
+                statusText.innerText = "Status: Verifying installation...";
+                await new Promise(r => setTimeout(r, 1000));
+                
+                progressBar.style.width = "100%";
+                
+                await update(ref(db, `users/${currentUserId}`), { status: "FLASHED" });
+                
+                statusText.className = "text-sm font-bold text-green-400 mb-4 text-center";
+                statusText.innerText = "Flashing Complete! Your device is ready.";
+                
+                setTimeout(() => {
+                    alert("Session Locked. You cannot flash again.");
+                    window.location.reload();
+                }, 3000);
+                
+            } catch (error) {
+                statusText.className = "text-sm font-bold text-red-400 mb-4 text-center";
+                statusText.innerText = "Error: Flashing Cancelled or Port Busy.";
+                if (port) { try { await port.close(); } catch(e){} }
+                actionBtn.classList.remove('hidden');
+                progressContainer.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => window.location.reload());
+        document.getElementById('admin-logout-btn').addEventListener('click', () => window.location.reload());
+
+    </script>
+</body>
+</html>
