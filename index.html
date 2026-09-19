@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Firmware & Asset Delivery Platform</title>
+    <title>R TRACK CREATIN - Secure Firmware & Asset Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -15,7 +15,7 @@
     <!-- Header -->
     <div class="w-full max-w-2xl flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-blue-500">TechFirmware<span class="text-white">Pro</span></h1>
+            <h1 class="text-2xl font-bold text-blue-500">R TRACK CREATIN<span class="text-white">Pro</span></h1>
             <p class="text-slate-400 text-xs">Secure Flash & Asset Portal</p>
         </div>
         <button onclick="showAdminLogin()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded border border-slate-700 text-slate-300">
@@ -24,7 +24,7 @@
     </div>
 
     <!-- 1. CUSTOMER LOGIN SECTION -->
-    <div id="login-section" class="w-full max-w-md bg-slate-800/90 backdrop-blur rounded-2xl shadow-2xl p-8 border border-slate-700">
+    <div id="login-section" class="w-full max-w-md bg-slate-800/95 backdrop-blur rounded-2xl shadow-2xl p-8 border border-slate-700">
         <h2 class="text-xl font-bold mb-4 text-center">Customer Access Login</h2>
         <div id="error-msg" class="hidden bg-red-500/20 text-red-400 border border-red-500/50 rounded p-3 mb-4 text-xs font-semibold text-center"></div>
 
@@ -44,7 +44,7 @@
     </div>
 
     <!-- 2. FLASH & ASSET DOWNLOAD SECTION -->
-    <div id="flash-section" class="hidden w-full max-w-md bg-slate-800/90 backdrop-blur rounded-2xl shadow-2xl p-8 border border-slate-700 text-center">
+    <div id="flash-section" class="hidden w-full max-w-md bg-slate-800/95 backdrop-blur rounded-2xl shadow-2xl p-8 border border-slate-700 text-center">
         <div class="mb-4">
             <h2 class="text-xl font-bold text-white">Device Flash Hub</h2>
             <p class="text-slate-400 text-xs mt-1">Logged ID: <span id="display-id" class="text-blue-400 font-bold"></span></p>
@@ -60,13 +60,13 @@
             Start Secure Flashing
         </button>
 
-        <!-- SD Card / Connection Files Download (Appears ONLY after successful flash) -->
+        <!-- Connection Details PDF Download Box (Appears ONLY after successful flash) -->
         <div id="asset-download-box" class="hidden mt-4 p-4 bg-slate-900 rounded-lg border border-green-500/50 text-left">
-            <h3 class="text-xs font-bold text-green-400 mb-1">📦 SD Card / Connection Files Unlocked</h3>
-            <p class="text-xs text-slate-400 mb-3">Download your companion configuration files below:</p>
-            <a id="download-link" href="#" download="Connection_Details.txt" class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 rounded transition-all">
-                Download Connection Assets / SD Card Files
-            </a>
+            <h3 class="text-xs font-bold text-green-400 mb-1">📦 R TRACK CREATIN Assets Unlocked</h3>
+            <p class="text-xs text-slate-400 mb-3">Download your official connection & pinout details PDF below:</p>
+            <button onclick="downloadPDF()" class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 rounded transition-all">
+                Download Connection Details (PDF)
+            </button>
         </div>
         
         <button onclick="logout()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium py-2 px-4 rounded-lg transition-all mt-3 text-xs">
@@ -75,9 +75,9 @@
     </div>
 
     <!-- 3. ADMIN PANEL SECTION -->
-    <div id="admin-section" class="hidden w-full max-w-lg bg-slate-800/90 backdrop-blur rounded-2xl shadow-2xl p-6 border border-slate-700">
+    <div id="admin-section" class="hidden w-full max-w-lg bg-slate-800/95 backdrop-blur rounded-2xl shadow-2xl p-6 border border-slate-700">
         <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-            <h2 class="text-lg font-bold text-blue-400">Admin Control Panel</h2>
+            <h2 class="text-lg font-bold text-blue-400">R TRACK CREATIN Admin Panel</h2>
             <button onclick="logout()" class="text-xs bg-red-600/20 text-red-400 border border-red-500/30 px-2.5 py-1 rounded">Logout Admin</button>
         </div>
 
@@ -88,13 +88,6 @@
                 <input type="text" id="new-user" placeholder="Customer ID" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 mb-2 text-white">
                 <input type="password" id="new-pass" placeholder="Password" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 mb-2 text-white">
                 <button onclick="createCustomerUser()" class="w-full bg-blue-600 text-white font-semibold py-2 rounded">Generate & Save ID</button>
-            </div>
-
-            <!-- Upload Connection / SD Card Files -->
-            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                <h3 class="font-semibold text-slate-200 mb-2">Upload SD Card / Connection Files</h3>
-                <input type="file" id="asset-file-input" class="w-full text-slate-400 mb-2 text-xs file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500">
-                <button onclick="uploadAssetFile()" class="w-full bg-green-600 text-white font-semibold py-2 rounded">Upload Asset for Customers</button>
             </div>
 
             <!-- Force Logout Control -->
@@ -119,6 +112,9 @@
         </div>
     </div>
 
+    <!-- Simple PDF Generation Library via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script>
         // Initialize default demo user if not present
         if (!localStorage.getItem("user_roobesh_pass")) {
@@ -138,7 +134,6 @@
             const aid = document.getElementById('admin-id').value;
             const apass = document.getElementById('admin-pass').value;
 
-            // Using your exact requested credentials
             if (aid === "roobesh" && apass === "09112007@") {
                 closeAdminModal();
                 document.getElementById('login-section').classList.add('hidden');
@@ -150,7 +145,6 @@
         }
 
         function attemptLogin() {
-            // Check if force logout flag is active
             if (localStorage.getItem("force_logout_active") === "true") {
                 alert("Session expired by Admin. Please re-login.");
                 localStorage.removeItem("force_logout_active");
@@ -205,18 +199,64 @@
                 await new Promise(r => setTimeout(r, 900));
             }
 
-            // Mark token as USED permanently in database/storage
+            // Mark token as USED permanently
             localStorage.setItem(`user_${activeUser}_status`, "USED");
             
             statusText.className = "text-xs font-bold text-green-400 mb-4 bg-slate-900 p-3 rounded border border-green-500/50";
             statusText.innerText = "Firmware Flashed Successfully! Token permanently locked.";
 
-            // Show SD card / connection file download box
-            const savedFileContent = localStorage.getItem("admin_uploaded_asset") || "Default Connection & SD Card setup guide contents...";
-            const blob = new Blob([savedFileContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            document.getElementById('download-link').href = url;
+            // Show PDF download box containing R TRACK CREATIN details
             document.getElementById('asset-download-box').classList.remove('hidden');
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // PDF Design with R TRACK CREATIN branding & requested pinouts[cite: 2]
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 210, 297, "F");
+
+            doc.setTextColor(59, 130, 246);
+            doc.setFontSize(22);
+            doc.text("R TRACK CREATIN", 20, 25);
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.text("Official Connection & SD Card Setup Guide", 20, 35);
+
+            doc.setFontSize(10);
+            doc.setTextColor(148, 163, 184);
+            doc.text("Generated securely after successful firmware flashing.", 20, 42);
+
+            doc.setDrawColor(51, 65, 85);
+            doc.line(20, 48, 190, 48);
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(11);
+            let y = 60;
+
+            const details = [
+                "OLED: SDA GPIO15, SCL GPIO16",[cite: 2]
+                "Buttons: Up GPIO41, Down GPIO40, Left GPIO39, Right GPIO38, OK GPIO0, Back GPIO1",[cite: 2]
+                "SD Card: CS GPIO3, MISO GPIO8, MOSI GPIO17, SCK GPIO18",[cite: 2]
+                "CC1101: SCK GPIO13, MISO GPIO11, MOSI GPIO12, CS GPIO46, GDO0 GPIO9, GDO2 GPIO10",[cite: 2]
+                "NRF24L01: SCK GPIO13, MISO GPIO11, MOSI GPIO12, CS GPIO14, CE GPIO21",[cite: 2]
+                "IR: TX GPIO5, RX GPIO4",[cite: 2]
+                "WS2812: DATA GPIO45",[cite: 2]
+                "Battery ADC: GPIO2"[cite: 2]
+            ];
+
+            details.forEach(item => {
+                doc.text("• " + item, 20, y);
+                y += 10;
+            });
+
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text("© R TRACK CREATIN - All rights reserved. Strict single-use license.", 20, 270);
+
+            doc.save("R_Track_Creatin_Connection_Details.pdf");
         }
 
         function createCustomerUser() {
@@ -231,21 +271,6 @@
             alert(`Customer ID '${u}' created successfully!`);
             document.getElementById('new-user').value = '';
             document.getElementById('new-pass').value = '';
-        }
-
-        function uploadAssetFile() {
-            const fileInput = document.getElementById('asset-file-input');
-            if(fileInput.files.length === 0) {
-                alert("Please select a file first!");
-                return;
-            }
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                localStorage.setItem("admin_uploaded_asset", e.target.result);
-                alert("SD Card / Connection file uploaded successfully! Customers can now download it after flashing.");
-            };
-            reader.readAsText(file);
         }
 
         function forceGlobalLogout() {
