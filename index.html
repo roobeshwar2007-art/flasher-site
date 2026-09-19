@@ -3,132 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R TRACK CREATIN - Secure Firmware & Asset Portal</title>
+    <title>R TRACK CREATIN - Premium Firmware Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        /* Apple Glass Effect (Glassmorphism) */
+        .apple-glass {
+            background: rgba(15, 23, 42, 0.4); /* Dark transparent */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Background Video Fullscreen */
+        .bg-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+            filter: brightness(0.4); /* Darkens the video slightly for text readability */
+        }
+        
         .hidden { display: none; }
+        body { color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
+    <!-- Background Video (Replace src with your actual video link or file name) -->
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="your-background-video.mp4" type="video/mp4">
+        <!-- Backup URL if local video is missing -->
+        <source src="https://cdn.pixabay.com/vimeo/328731776/technology-23000.mp4?width=1280&hash=0bf2826a7cfcf99b2dd5a5dc6ee9b7d8b5c9dc5e" type="video/mp4">
+    </video>
+
     <!-- Header -->
-    <div class="w-full max-w-2xl flex justify-between items-center mb-6">
+    <div class="w-full max-w-2xl flex justify-between items-center mb-6 relative z-10">
         <div>
-            <h1 class="text-2xl font-bold text-blue-500">R TRACK CREATIN<span class="text-white">Pro</span></h1>
-            <p class="text-slate-400 text-xs">Secure Flash & Asset Portal</p>
+            <h1 class="text-2xl font-bold text-white drop-shadow-lg">R TRACK CREATIN<span class="text-blue-400">Pro</span></h1>
+            <p class="text-slate-300 text-xs drop-shadow-md">Secure Flash & Asset Portal</p>
         </div>
-        <button onclick="showAdminLogin()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded border border-slate-700 text-slate-300">
+        <button onclick="showAdminLogin()" class="apple-glass hover:bg-white/10 text-xs px-4 py-2 rounded-full text-white transition-all">
             Admin Panel
         </button>
     </div>
 
     <!-- 1. CUSTOMER LOGIN SECTION -->
-    <div id="login-section" class="w-full max-w-md bg-slate-800/95 backdrop-blur rounded-2xl shadow-2xl p-8 border border-slate-700">
-        <h2 class="text-xl font-bold mb-4 text-center">Customer Access Login</h2>
-        <div id="error-msg" class="hidden bg-red-500/20 text-red-400 border border-red-500/50 rounded p-3 mb-4 text-xs font-semibold text-center"></div>
+    <div id="login-section" class="w-full max-w-md apple-glass rounded-3xl p-8 text-center relative z-10">
+        <h2 class="text-xl font-semibold mb-6 text-white tracking-wide">Customer Access</h2>
+        <div id="error-msg" class="hidden bg-red-500/20 text-red-300 border border-red-500/50 rounded-lg p-3 mb-4 text-xs font-semibold"></div>
 
-        <div class="space-y-4">
+        <div class="space-y-4 text-left">
             <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">Flash ID</label>
-                <input type="text" id="userid" placeholder="Enter given ID" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                <label class="block text-xs font-medium text-slate-300 mb-1 ml-1">Flash ID</label>
+                <input type="text" id="userid" placeholder="Enter given ID" class="w-full bg-black/30 border border-slate-600/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all placeholder-slate-500">
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">Password</label>
-                <input type="password" id="password" placeholder="Enter password" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                <label class="block text-xs font-medium text-slate-300 mb-1 ml-1">Password</label>
+                <input type="password" id="password" placeholder="Enter password" class="w-full bg-black/30 border border-slate-600/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all placeholder-slate-500">
             </div>
-            <button onclick="attemptLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg transition-all text-sm">
+            <button onclick="attemptLogin()" class="w-full bg-blue-500/80 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-xl transition-all text-sm mt-2 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                 Login & Proceed
             </button>
         </div>
     </div>
 
     <!-- 2. FLASH & ASSET DOWNLOAD SECTION -->
-    <div id="flash-section" class="hidden w-full max-w-md bg-slate-800/95 backdrop-blur rounded-2xl shadow-2xl p-8 border border-slate-700 text-center">
-        <div class="mb-4">
-            <h2 class="text-xl font-bold text-white">Device Flash Hub</h2>
-            <p class="text-slate-400 text-xs mt-1">Logged ID: <span id="display-id" class="text-blue-400 font-bold"></span></p>
+    <div id="flash-section" class="hidden w-full max-w-md apple-glass rounded-3xl p-8 text-center relative z-10">
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-white tracking-wide">Device Flash Hub</h2>
+            <p class="text-slate-300 text-xs mt-1">Logged ID: <span id="display-id" class="text-blue-400 font-bold"></span></p>
         </div>
 
-        <div id="status-text" class="text-xs font-semibold text-blue-400 mb-4 bg-slate-900 p-3 rounded border border-slate-700">Status: Connected & Ready to Flash</div>
+        <div id="status-text" class="text-xs font-semibold text-blue-300 mb-4 bg-black/30 p-4 rounded-xl border border-white/10">Status: Connected & Ready to Flash</div>
 
-        <div id="progress-container" class="hidden w-full bg-slate-700 rounded-full h-2 mb-4">
-            <div id="progress-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        <div id="progress-container" class="hidden w-full bg-black/40 rounded-full h-2.5 mb-6 border border-white/10 overflow-hidden">
+            <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.8)]" style="width: 0%"></div>
         </div>
 
-        <button id="action-btn" onclick="startFlash()" class="w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-2.5 px-4 rounded-lg transition-all text-sm mb-3">
+        <button id="action-btn" onclick="startFlash()" class="w-full bg-green-500/80 hover:bg-green-500 text-white font-semibold py-3 px-4 rounded-xl transition-all text-sm mb-3 shadow-[0_0_15px_rgba(34,197,94,0.5)]">
             Start Secure Flashing
         </button>
 
-        <!-- Connection Details PDF Download Box (Appears ONLY after successful flash) -->
-        <div id="asset-download-box" class="hidden mt-4 p-4 bg-slate-900 rounded-lg border border-green-500/50 text-left">
-            <h3 class="text-xs font-bold text-green-400 mb-1">📦 R TRACK CREATIN Assets Unlocked</h3>
-            <p class="text-xs text-slate-400 mb-3">Download your official connection & pinout details PDF below:</p>
-            <button onclick="downloadPDF()" class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 rounded transition-all">
+        <!-- Connection Details PDF Download Box -->
+        <div id="asset-download-box" class="hidden mt-4 p-5 bg-black/40 rounded-xl border border-green-400/30 text-left">
+            <h3 class="text-sm font-bold text-green-400 mb-2">📦 Assets Unlocked</h3>
+            <p class="text-xs text-slate-300 mb-4 leading-relaxed">Download your official <b>R TRACK CREATIN</b> connection & pinout details PDF below:</p>
+            <button onclick="downloadPDF()" class="block w-full text-center bg-blue-500/80 hover:bg-blue-500 text-white text-xs font-semibold py-3 rounded-xl transition-all">
                 Download Connection Details (PDF)
             </button>
         </div>
         
-        <button onclick="logout()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium py-2 px-4 rounded-lg transition-all mt-3 text-xs">
+        <button onclick="logout()" class="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-2.5 px-4 rounded-xl transition-all mt-4 text-xs">
             Logout
         </button>
     </div>
 
     <!-- 3. ADMIN PANEL SECTION -->
-    <div id="admin-section" class="hidden w-full max-w-lg bg-slate-800/95 backdrop-blur rounded-2xl shadow-2xl p-6 border border-slate-700">
-        <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-            <h2 class="text-lg font-bold text-blue-400">R TRACK CREATIN Admin Panel</h2>
-            <button onclick="logout()" class="text-xs bg-red-600/20 text-red-400 border border-red-500/30 px-2.5 py-1 rounded">Logout Admin</button>
+    <div id="admin-section" class="hidden w-full max-w-lg apple-glass rounded-3xl p-8 relative z-10">
+        <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+            <h2 class="text-lg font-bold text-white tracking-wide">Admin Panel</h2>
+            <button onclick="logout()" class="text-xs bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 px-3 py-1.5 rounded-full transition-all">Close Admin</button>
         </div>
 
-        <div class="space-y-4 text-xs">
-            <!-- Create User / Pass -->
-            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                <h3 class="font-semibold text-slate-200 mb-2">Create Customer Flash ID</h3>
-                <input type="text" id="new-user" placeholder="Customer ID" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 mb-2 text-white">
-                <input type="password" id="new-pass" placeholder="Password" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 mb-2 text-white">
-                <button onclick="createCustomerUser()" class="w-full bg-blue-600 text-white font-semibold py-2 rounded">Generate & Save ID</button>
+        <div class="space-y-5 text-sm">
+            <div class="bg-black/30 p-5 rounded-2xl border border-white/10">
+                <h3 class="font-semibold text-white mb-3">Create Customer Flash ID</h3>
+                <input type="text" id="new-user" placeholder="Customer ID" class="w-full bg-black/50 border border-slate-600/50 rounded-xl px-4 py-2.5 mb-3 text-white focus:outline-none focus:border-blue-400">
+                <input type="password" id="new-pass" placeholder="Password" class="w-full bg-black/50 border border-slate-600/50 rounded-xl px-4 py-2.5 mb-4 text-white focus:outline-none focus:border-blue-400">
+                <button onclick="createCustomerUser()" class="w-full bg-blue-500/80 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl transition-all">Generate & Save ID</button>
             </div>
 
-            <!-- Force Logout Control -->
-            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                <h3 class="font-semibold text-slate-200 mb-2">Active Session Management</h3>
-                <p class="text-slate-400 mb-2">Force-terminate all active user sessions immediately.</p>
-                <button onclick="forceGlobalLogout()" class="w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-2 rounded">Force Logout All Users</button>
+            <div class="bg-black/30 p-5 rounded-2xl border border-white/10">
+                <h3 class="font-semibold text-white mb-2">Active Session Management</h3>
+                <p class="text-slate-400 mb-4 text-xs">Force-terminate all active user sessions immediately.</p>
+                <button onclick="forceGlobalLogout()" class="w-full bg-red-500/80 hover:bg-red-500 text-white font-semibold py-2.5 rounded-xl transition-all">Force Logout All Users</button>
             </div>
         </div>
     </div>
 
     <!-- Admin Login Modal Overlay -->
-    <div id="admin-login-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4">
-        <div class="bg-slate-800 p-6 rounded-xl max-w-sm w-full border border-slate-700">
-            <h3 class="text-lg font-bold mb-3 text-white">Admin Authentication</h3>
-            <input type="text" id="admin-id" placeholder="Admin ID (roobesh)" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 mb-2 text-white text-xs">
-            <input type="password" id="admin-pass" placeholder="Password (09112007@)" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 mb-3 text-white text-xs">
-            <div class="flex gap-2">
-                <button onclick="verifyAdminLogin()" class="flex-1 bg-blue-600 text-white text-xs font-semibold py-2 rounded">Login</button>
-                <button onclick="closeAdminModal()" class="flex-1 bg-slate-700 text-slate-300 text-xs font-semibold py-2 rounded">Cancel</button>
+    <div id="admin-login-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="apple-glass p-8 rounded-3xl max-w-sm w-full">
+            <h3 class="text-lg font-semibold mb-5 text-white tracking-wide text-center">Admin Authentication</h3>
+            <input type="text" id="admin-id" placeholder="Admin ID" class="w-full bg-black/40 border border-slate-600/50 rounded-xl px-4 py-3 mb-3 text-white text-sm focus:outline-none focus:border-blue-400">
+            <input type="password" id="admin-pass" placeholder="Password" class="w-full bg-black/40 border border-slate-600/50 rounded-xl px-4 py-3 mb-5 text-white text-sm focus:outline-none focus:border-blue-400">
+            <div class="flex gap-3">
+                <button onclick="verifyAdminLogin()" class="flex-1 bg-blue-500/80 hover:bg-blue-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all">Login</button>
+                <button onclick="closeAdminModal()" class="flex-1 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold py-2.5 rounded-xl transition-all">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- Simple PDF Generation Library via CDN -->
+    <!-- PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
-        // Initialize default demo user if not present
         if (!localStorage.getItem("user_roobesh_pass")) {
             localStorage.setItem("user_roobesh_pass", "09112007@");
             localStorage.setItem("user_roobesh_status", "UNUSED");
         }
 
-        function showAdminLogin() {
-            document.getElementById('admin-login-modal').classList.remove('hidden');
-        }
-
-        function closeAdminModal() {
-            document.getElementById('admin-login-modal').classList.add('hidden');
-        }
+        function showAdminLogin() { document.getElementById('admin-login-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-login-modal').classList.add('hidden'); }
 
         function verifyAdminLogin() {
             const aid = document.getElementById('admin-id').value;
@@ -154,13 +174,12 @@
             const uid = document.getElementById('userid').value;
             const pass = document.getElementById('password').value;
             const errorMsg = document.getElementById('error-msg');
-
             const storedPass = localStorage.getItem(`user_${uid}_pass`);
             const status = localStorage.getItem(`user_${uid}_status`);
 
             if (storedPass && storedPass === pass) {
                 if (status === "USED") {
-                    errorMsg.innerText = "Error: This ID has already been used and is now expired!";
+                    errorMsg.innerText = "Error: This ID has already been used and is expired!";
                     errorMsg.classList.remove('hidden');
                 } else {
                     errorMsg.classList.add('hidden');
@@ -199,13 +218,9 @@
                 await new Promise(r => setTimeout(r, 900));
             }
 
-            // Mark token as USED permanently
             localStorage.setItem(`user_${activeUser}_status`, "USED");
-            
-            statusText.className = "text-xs font-bold text-green-400 mb-4 bg-slate-900 p-3 rounded border border-green-500/50";
+            statusText.className = "text-xs font-bold text-green-300 mb-4 bg-black/40 p-4 rounded-xl border border-green-400/30";
             statusText.innerText = "Firmware Flashed Successfully! Token permanently locked.";
-
-            // Show PDF download box containing R TRACK CREATIN details
             document.getElementById('asset-download-box').classList.remove('hidden');
         }
 
@@ -213,7 +228,6 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // PDF Design with R TRACK CREATIN branding & requested pinouts[cite: 2]
             doc.setFillColor(15, 23, 42);
             doc.rect(0, 0, 210, 297, "F");
 
@@ -237,14 +251,14 @@
             let y = 60;
 
             const details = [
-                "OLED: SDA GPIO15, SCL GPIO16",[cite: 2]
-                "Buttons: Up GPIO41, Down GPIO40, Left GPIO39, Right GPIO38, OK GPIO0, Back GPIO1",[cite: 2]
-                "SD Card: CS GPIO3, MISO GPIO8, MOSI GPIO17, SCK GPIO18",[cite: 2]
-                "CC1101: SCK GPIO13, MISO GPIO11, MOSI GPIO12, CS GPIO46, GDO0 GPIO9, GDO2 GPIO10",[cite: 2]
-                "NRF24L01: SCK GPIO13, MISO GPIO11, MOSI GPIO12, CS GPIO14, CE GPIO21",[cite: 2]
-                "IR: TX GPIO5, RX GPIO4",[cite: 2]
-                "WS2812: DATA GPIO45",[cite: 2]
-                "Battery ADC: GPIO2"[cite: 2]
+                "OLED: SDA GPIO15, SCL GPIO16",
+                "Buttons: Up GPIO41, Down GPIO40, Left GPIO39, Right GPIO38, OK GPIO0, Back GPIO1",
+                "SD Card: CS GPIO3, MISO GPIO8, MOSI GPIO17, SCK GPIO18",
+                "CC1101: SCK GPIO13, MISO GPIO11, MOSI GPIO12, CS GPIO46, GDO0 GPIO9, GDO2 GPIO10",
+                "NRF24L01: SCK GPIO13, MISO GPIO11, MOSI GPIO12, CS GPIO14, CE GPIO21",
+                "IR: TX GPIO5, RX GPIO4",
+                "WS2812: DATA GPIO45",
+                "Battery ADC: GPIO2"
             ];
 
             details.forEach(item => {
@@ -262,10 +276,7 @@
         function createCustomerUser() {
             const u = document.getElementById('new-user').value;
             const p = document.getElementById('new-pass').value;
-            if(!u || !p) {
-                alert("Enter both ID and Password!");
-                return;
-            }
+            if(!u || !p) { alert("Enter both ID and Password!"); return; }
             localStorage.setItem(`user_${u}_pass`, p);
             localStorage.setItem(`user_${u}_status`, "UNUSED");
             alert(`Customer ID '${u}' created successfully!`);
