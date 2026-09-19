@@ -6,7 +6,6 @@
     <title>R TRACK CREATIN - Premium Firmware Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Apple Glass Effect */
         .apple-glass {
             background: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(25px);
@@ -14,8 +13,6 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
         }
-        
-        /* Background Video Fullscreen */
         .bg-video {
             position: fixed;
             top: 50%;
@@ -27,23 +24,21 @@
             z-index: -1;
             transform: translate(-50%, -50%);
             object-fit: cover;
-            filter: brightness(0.3); /* Video-vai konjam dark aakkum */
+            filter: brightness(0.3);
         }
-        
         .hidden { display: none; }
         body { color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
-    <!-- Background Video (Local video or Online fallback) -->
+    <!-- Background Video -->
     <video autoplay muted loop playsinline class="bg-video">
         <source src="bg.mp4" type="video/mp4">
-        <!-- Online Backup Video -->
         <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-connection-background-40747-large.mp4" type="video/mp4">
     </video>
 
-    <!-- Header (Admin button removed completely) -->
+    <!-- Header -->
     <div class="w-full max-w-2xl flex justify-center items-center mb-8 relative z-10">
         <div class="text-center">
             <h1 class="text-3xl font-bold text-white drop-shadow-lg tracking-wider">R TRACK CREATIN<span class="text-blue-500">Pro</span></h1>
@@ -51,7 +46,7 @@
         </div>
     </div>
 
-    <!-- 1. UNIFIED LOGIN SECTION (For Both Customer & Admin) -->
+    <!-- 1. UNIFIED LOGIN SECTION -->
     <div id="login-section" class="w-full max-w-md apple-glass rounded-3xl p-8 text-center relative z-10">
         <h2 class="text-xl font-semibold mb-6 text-white tracking-wide">Portal Access</h2>
         <div id="error-msg" class="hidden bg-red-500/20 text-red-300 border border-red-500/50 rounded-lg p-3 mb-4 text-xs font-semibold"></div>
@@ -59,11 +54,11 @@
         <div class="space-y-4 text-left">
             <div>
                 <label class="block text-xs font-medium text-slate-300 mb-1 ml-1">Access ID</label>
-                <input type="text" id="userid" placeholder="Enter your ID" class="w-full bg-black/40 border border-slate-600/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all placeholder-slate-500">
+                <input type="text" id="userid" placeholder="Enter your ID" class="w-full bg-black/40 border border-slate-600/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-400">
             </div>
             <div>
                 <label class="block text-xs font-medium text-slate-300 mb-1 ml-1">Password</label>
-                <input type="password" id="password" placeholder="Enter password" class="w-full bg-black/40 border border-slate-600/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all placeholder-slate-500">
+                <input type="password" id="password" placeholder="Enter password" class="w-full bg-black/40 border border-slate-600/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-400">
             </div>
             <button onclick="attemptLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-xl transition-all text-sm mt-4 shadow-[0_0_15px_rgba(37,99,235,0.5)]">
                 Login & Proceed
@@ -80,6 +75,12 @@
 
         <div id="status-text" class="text-xs font-semibold text-blue-300 mb-4 bg-black/40 p-4 rounded-xl border border-white/10">Status: Connected & Ready to Flash</div>
 
+        <!-- ERASE TOGGLE OPTION -->
+        <div class="flex items-center justify-center space-x-2 mb-4 bg-black/30 p-3 rounded-lg border border-slate-600/50">
+            <input type="checkbox" id="erase-chip" class="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500" checked>
+            <label for="erase-chip" class="text-xs text-slate-300 cursor-pointer">Erase entire flash before writing</label>
+        </div>
+
         <div id="progress-container" class="hidden w-full bg-black/50 rounded-full h-2.5 mb-6 border border-white/10 overflow-hidden">
             <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.8)]" style="width: 0%"></div>
         </div>
@@ -90,7 +91,6 @@
 
         <div id="asset-download-box" class="hidden mt-4 p-5 bg-black/40 rounded-xl border border-green-400/30 text-left">
             <h3 class="text-sm font-bold text-green-400 mb-2">📦 Assets Unlocked</h3>
-            <p class="text-xs text-slate-300 mb-4 leading-relaxed">Download your official <b>R TRACK CREATIN</b> connection & pinout details PDF below:</p>
             <button onclick="downloadPDF()" class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-3 rounded-xl transition-all">
                 Download Connection Details (PDF)
             </button>
@@ -102,24 +102,48 @@
     </div>
 
     <!-- 3. ADMIN PANEL SECTION -->
-    <div id="admin-section" class="hidden w-full max-w-lg apple-glass rounded-3xl p-8 relative z-10">
+    <div id="admin-section" class="hidden w-full max-w-lg apple-glass rounded-3xl p-8 relative z-10 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
             <h2 class="text-lg font-bold text-white tracking-wide">Admin Control Panel</h2>
             <button onclick="logout()" class="text-xs bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 px-3 py-1.5 rounded-full transition-all">Logout Admin</button>
         </div>
 
         <div class="space-y-5 text-sm">
+            
+            <!-- FIRMWARE UPLOAD & BAUD RATE -->
+            <div class="bg-black/40 p-5 rounded-2xl border border-blue-500/30">
+                <h3 class="font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Firmware Configuration
+                </h3>
+                
+                <label class="block text-xs font-medium text-slate-300 mb-1">Upload Firmware File (.bin)</label>
+                <input type="file" id="fw-file" accept=".bin" class="w-full text-sm text-slate-400 mb-3 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600/20 file:text-blue-400 hover:file:bg-blue-600/40 transition-all cursor-pointer">
+                
+                <label class="block text-xs font-medium text-slate-300 mb-1">Select Baud Rate</label>
+                <select id="baud-rate" class="w-full bg-black/50 border border-slate-600/50 rounded-xl px-4 py-2.5 mb-4 text-white focus:outline-none focus:border-blue-400">
+                    <option value="9600">9600</option>
+                    <option value="115200" selected>115200 (Default)</option>
+                    <option value="460800">460800</option>
+                    <option value="921600">921600 (Fast)</option>
+                </select>
+                
+                <button onclick="saveFirmwareConfig()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl transition-all shadow-[0_0_10px_rgba(37,99,235,0.4)]">
+                    Save Config to Server
+                </button>
+            </div>
+
             <div class="bg-black/40 p-5 rounded-2xl border border-white/10">
                 <h3 class="font-semibold text-white mb-3">Create Customer Access ID</h3>
                 <input type="text" id="new-user" placeholder="Customer ID" class="w-full bg-black/50 border border-slate-600/50 rounded-xl px-4 py-2.5 mb-3 text-white focus:outline-none focus:border-blue-400">
                 <input type="password" id="new-pass" placeholder="Password" class="w-full bg-black/50 border border-slate-600/50 rounded-xl px-4 py-2.5 mb-4 text-white focus:outline-none focus:border-blue-400">
-                <button onclick="createCustomerUser()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl transition-all shadow-[0_0_10px_rgba(37,99,235,0.4)]">Generate & Save ID</button>
+                <button onclick="createCustomerUser()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-xl transition-all">Generate & Save ID</button>
             </div>
 
-            <div class="bg-black/40 p-5 rounded-2xl border border-white/10">
-                <h3 class="font-semibold text-white mb-2">Session Management</h3>
+            <div class="bg-black/40 p-5 rounded-2xl border border-red-500/20">
+                <h3 class="font-semibold text-red-400 mb-2">Session Management</h3>
                 <p class="text-slate-400 mb-4 text-xs">Force-terminate all active user sessions immediately.</p>
-                <button onclick="forceGlobalLogout()" class="w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-2.5 rounded-xl transition-all">Force Logout All Users</button>
+                <button onclick="forceGlobalLogout()" class="w-full bg-red-600/80 hover:bg-red-500 text-white font-semibold py-2.5 rounded-xl transition-all">Force Logout All Users</button>
             </div>
         </div>
     </div>
@@ -138,16 +162,13 @@
             const pass = document.getElementById('password').value.trim();
             const errorMsg = document.getElementById('error-msg');
 
-            // --- SECRET ADMIN LOGIN LOGIC ---
             if (uid === "roobesh" && pass === "09112007@") {
                 errorMsg.classList.add('hidden');
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('admin-section').classList.remove('hidden');
                 return;
             }
-            // --------------------------------
 
-            // --- CUSTOMER LOGIN LOGIC ---
             const storedPass = localStorage.getItem(`user_${uid}_pass`);
             const status = localStorage.getItem(`user_${uid}_status`);
 
@@ -168,28 +189,49 @@
             }
         }
 
+        function saveFirmwareConfig() {
+            const baud = document.getElementById('baud-rate').value;
+            const fileInput = document.getElementById('fw-file');
+            
+            if(fileInput.files.length > 0) {
+                localStorage.setItem("admin_fw_name", fileInput.files[0].name);
+            }
+            localStorage.setItem("admin_baud_rate", baud);
+            alert(`Firmware Config Saved!\nBaud Rate: ${baud}`);
+        }
+
         async function startFlash() {
             const statusText = document.getElementById('status-text');
             const actionBtn = document.getElementById('action-btn');
             const progressContainer = document.getElementById('progress-container');
             const progressBar = document.getElementById('progress-bar');
             const activeUser = localStorage.getItem("active_user");
+            const eraseChecked = document.getElementById('erase-chip').checked;
+            const baudRate = localStorage.getItem("admin_baud_rate") || "115200";
 
             actionBtn.classList.add('hidden');
             progressContainer.classList.remove('hidden');
+            document.getElementById('erase-chip').parentElement.classList.add('hidden');
             
-            const stages = [
-                { msg: "Connecting to target MCU...", progress: 20 },
-                { msg: "Erasing flash sectors...", progress: 40 },
-                { msg: "Streaming encrypted firmware securely...", progress: 70 },
-                { msg: "Verifying binary checksum...", progress: 90 },
-                { msg: "Flashing Complete!", progress: 100 }
-            ];
+            // Dynamic stages based on Erase checkbox
+            let stages = [];
+            stages.push({ msg: `Connecting to target MCU (Baud: ${baudRate})...`, progress: 15 });
+            
+            if(eraseChecked) {
+                stages.push({ msg: "Erasing flash sectors completely...", progress: 35 });
+                stages.push({ msg: "Streaming encrypted firmware securely...", progress: 70 });
+            } else {
+                stages.push({ msg: "Skipping erase. Direct overwriting...", progress: 35 });
+                stages.push({ msg: "Streaming encrypted firmware securely...", progress: 70 });
+            }
+            
+            stages.push({ msg: "Verifying binary checksum...", progress: 90 });
+            stages.push({ msg: "Flashing Complete!", progress: 100 });
 
             for (let stage of stages) {
                 statusText.innerText = "Status: " + stage.msg;
                 progressBar.style.width = stage.progress + "%";
-                await new Promise(r => setTimeout(r, 900));
+                await new Promise(r => setTimeout(r, 1200));
             }
 
             localStorage.setItem(`user_${activeUser}_status`, "USED");
@@ -207,21 +249,12 @@
             doc.setFontSize(10); doc.setTextColor(148, 163, 184); doc.text("Generated securely after successful firmware flashing.", 20, 42);
             doc.setDrawColor(51, 65, 85); doc.line(20, 48, 190, 48);
             doc.setTextColor(255, 255, 255); doc.setFontSize(11);
-            
             let y = 60;
             const details = [
                 "OLED: SDA GPIO15, SCL GPIO16",
-                "Buttons: Up GPIO41, Down GPIO40, Left GPIO39, Right GPIO38, OK GPIO0, Back GPIO1",
-                "SD Card: CS GPIO3, MISO GPIO8, MOSI GPIO17, SCK GPIO18",
-                "CC1101: SCK GPIO13, MISO GPIO11, MOSI GPIO12, CS GPIO46, GDO0 GPIO9, GDO2 GPIO10",
-                "NRF24L01: SCK GPIO13, MISO GPIO11, MOSI GPIO12, CS GPIO14, CE GPIO21",
-                "IR: TX GPIO5, RX GPIO4",
-                "WS2812: DATA GPIO45",
-                "Battery ADC: GPIO2"
+                "Buttons: Up GPIO41, Down GPIO40, Left GPIO39, Right GPIO38, OK GPIO0, Back GPIO1"
             ];
             details.forEach(item => { doc.text("• " + item, 20, y); y += 10; });
-            
-            doc.setFontSize(9); doc.setTextColor(100, 116, 139); doc.text("© R TRACK CREATIN - All rights reserved. Strict single-use license.", 20, 270);
             doc.save("R_Track_Creatin_Connection_Details.pdf");
         }
 
@@ -248,3 +281,5 @@
     </script>
 </body>
 </html>
+
+          
